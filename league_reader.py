@@ -14,4 +14,4 @@ if(gameValues != gameCompare):
     print("var set")
 
 
-#print(gameData.text)
+print(gameData.text)
