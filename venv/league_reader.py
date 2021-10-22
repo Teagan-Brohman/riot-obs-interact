@@ -42,7 +42,7 @@ def script_properties():  # ui
     p = S.obs_properties_add_list(
         props,
         "source",
-        "Text Source",
+        "Source to toggle when baron",
         S.OBS_COMBO_TYPE_EDITABLE,
         S.OBS_COMBO_FORMAT_STRING,
     )
@@ -54,7 +54,7 @@ def script_properties():  # ui
             S.obs_property_list_add_string(p, name, name)
 
         S.source_list_release(sources)
-    #S.obs_properties_add_button(props, "button", "Toggle", toggle_pressed)
+    S.obs_properties_add_button(props, "button", "test", toggle_pressed)
     #S.obs_properties_add_int(props, "Refresh Rate", "How often to check league",1,10,1)
     return props
 
