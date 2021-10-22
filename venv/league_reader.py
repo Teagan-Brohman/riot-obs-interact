@@ -1,15 +1,15 @@
 import requests
 import urllib3
+import datetime
+import math
+from datetime import timedelta
 import obspython as S
 #import riotwatcher
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) #disables warning for insecure https stuff
 
-interval = 3
-streamRunning = False
-
-
-
+interval = 3 #check every 3 seconds
+streamRunning = False #unused right now
 
 
 def on_event(event):
@@ -61,24 +61,43 @@ def script_properties():  # ui
 def gameRefresh():
     #gameReponse = requests.status_codes
     try:
-        gameData = requests.get('https://127.0.0.1:2999/liveclientdata/eventdata', verify=False)
-        gameJson = gameData.json()
-        gameValues = next((record["EventID"] for record in gameJson["Events"] if record["EventName"] == "MinionsSpawning"), None) 
-        gameCompare = []
-
-        print(gameValues)
-        if(gameValues != gameCompare):
-            print("var set")
+        getGameTime()
+        getBaronEvent()
+        
+        
 
     except requests.exceptions.ConnectionError:
         print("No connection found, is the game running?")
         streamRunning = False
         interval = 10
-    else:
-        print('nother error, should be fine')
+    
+
+def getGameTime():
+    gameTimeData = requests.get('https://127.0.0.1:2999/liveclientdata/gamestats',verify=False)
+    gameTimeJson = gameTimeData.json()
+    gameTime = gameTimeJson["gameTime"]
+    gameMinutes = str((datetime.timedelta(seconds=gameTime))) #converts seconds to minute hours format 00:00:00
+    avgString = str(gameMinutes).split(".")[0] #removes microseconds for output
+    print(avgString)
+
+def getBaronEvent():
+    gameData = requests.get('https://127.0.0.1:2999/liveclientdata/eventdata', verify=False)
+    gameJson = gameData.json()
+    gameValues = []
+    gameSearch = True
+    while gameSearch:
+        try:
+            gameValues.append(next((record["EventID"] for record in gameJson["Events"] if (record["EventName"] == "BaronKill") and record["EventID"] not in gameValues)))
+        except StopIteration:
+            gameSearch = False
+        
+    print(gameValues)
 
 
-   
+
+
+
+
 
 S.timer_add(gameRefresh, interval * 1000)    
 
